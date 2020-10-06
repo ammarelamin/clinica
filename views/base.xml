@@ -1,0 +1,443 @@
+<odoo>
+  <data>
+
+  <menuitem id="clinic_menu_root" name="Clinic" sequence="5"/>
+
+
+  <record id="patient_calendar_action" model="ir.actions.act_window">
+    <field name="type">ir.actions.act_window</field>
+    <field name="res_model">calendar.event</field>
+    <field name="view_mode">tree,calendar,form</field>
+    <field name="help" type="html">
+      <p class="oe_view_nocontent_create">
+      </p><p>
+      </p>
+    </field>
+  </record>
+
+
+  <!-- res.partner changes -->
+    <record id="res_partner_inherited_view" model="ir.ui.view">
+      <field name="name">res.partner.inherit.view.form</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//div[@name='button_box']" position="inside">
+          <button class="oe_stat_button" name="patient_history" type="object"
+          icon="fa-file-o" attrs="{'invisible':[('is_patient','=',False)]}">
+              <field string="History" name="appointments" widget="statinfo" />
+          </button>
+          <button class="oe_stat_button" name="laboratory_history" type="object" icon="fa-stethoscope" attrs="{'invisible':[('is_patient','=',False)]}">
+              <field string="Laboratory" name="tests_count" widget="statinfo" />
+          </button>
+        </xpath>
+        <xpath expr="//field[@name='name']" position="attributes">
+          <attribute name="placeholder">Name</attribute>
+        </xpath>
+        <xpath expr="//field[@name='type']" position="attributes">
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='parent_id']" position="attributes">
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='company_type']" position="replace">
+        </xpath>
+        <xpath expr="//field[@name='vat']" position="replace">
+        </xpath>
+        <xpath expr="//field[@name='category_id']" position="replace">
+        </xpath>
+        <xpath expr="//field[@name='website']" position="replace">
+        </xpath>
+        <xpath expr="//field[@name='phone']" position="replace">
+        </xpath>
+        <xpath expr="//field[@name='email']" position="replace">
+        </xpath>
+        <xpath expr="//page[1]" position="attributes">
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//page[2]" position="attributes">
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//page[3]" position="attributes">
+          <attribute name="invisible">False</attribute>
+        </xpath>
+        <xpath expr="//page[3]" position="before">
+          <page string="Patient Diseases" attrs="{'invisible':[('is_patient','=',False)]}">
+            <group>
+              <group>
+                <separator string="Diseases" col="4" colspan="4"
+                attrs="{'invisible':[('is_patient','=',False)]}"/>
+                <field name="disease_ids" nolabel="1" widget="many2many_tags"
+                attrs="{'invisible':[('is_patient','=',False)]}"/>
+              </group>
+            </group>
+          </page>
+        </xpath>
+        <xpath expr="//field[@name='title']" position="replace">
+        </xpath>
+        <xpath expr="//label[@for='email']" position="replace">
+        </xpath>
+        <xpath expr="//field[@name='function']" position="before">
+          <field name="patientID" attrs="{'invisible':[('is_patient','=',False)]}"/>
+        </xpath>
+        <xpath expr="//field[@name='patientID']" position="before">
+          <field name="is_patient"/>
+        </xpath>
+        <xpath expr="//field[@name='patientID']" position="after">
+          <field name="gender"
+          attrs="{'invisible':[('is_patient','=',False)]}"/>
+        </xpath>
+        <xpath expr="//field[@name='gender']" position="after">
+          <field name="date_of_birth"
+          attrs="{'invisible':[('is_patient','=',False)]}"/>
+        </xpath>
+        <xpath expr="//field[@name='date_of_birth']" position="after">
+          <field name="age" widget="char"
+          attrs="{'invisible':[('is_patient','=',False)]}"/>
+        </xpath>
+        <xpath expr="//label[@name='address_name']" position="attributes">
+          <attribute name="string">Address</attribute>
+        </xpath>
+        <xpath expr="//field[@name='function']" position="attributes">
+          <attribute name="invisible">True</attribute>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- res.partner inherit form view -->
+    <record id="res_partner_account_inherited_form" model="ir.ui.view">
+      <field name="name">res.partner.inherit.view.form</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="account.view_partner_property_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//group[@name='banks']" position="attributes">
+          <attribute name="invisible">True</attribute>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- res.partner inherit tree view -->
+    <record id="res_partner_inherited_tree" model="ir.ui.view">
+      <field name="name">res.partner.inherit.view.tree</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_tree"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='phone']" position="attributes">
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='email']" position="attributes">
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='display_name']" position="after">
+          <field name="mobile" optional="show"/>
+        </xpath>
+        <xpath expr="//field[@name='mobile']" position="after">
+          <field name="patientID" optional="show"/>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- res.partner inherit search view -->
+    <record id="res_partner_inherited_filter" model="ir.ui.view">
+      <field name="name">res.partner.inherit.view.filter</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_res_partner_filter"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='name']" position="after">
+          <field name="patientID" filter_domain="[('patientID', 'ilike', self)]"/>
+        </xpath>
+        <xpath expr="//field[@name='parent_id']" position="attributes">          
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='email']" position="attributes">          
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='phone']" position="attributes">          
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='category_id']" position="attributes">          
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//field[@name='user_id']" position="attributes">          
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//filter[@name='type_person']" position="attributes">          
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//filter[@name='type_company']" position="attributes">          
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//filter[@name='salesperson']" position="attributes">          
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//filter[@name='group_company']" position="attributes">          
+          <attribute name="invisible">True</attribute>
+        </xpath>
+        <xpath expr="//filter[@name='group_country']" position="attributes">          
+          <attribute name="invisible">False</attribute>
+        </xpath>
+        <xpath expr="//filter[@name='group_country']" position="before">          
+          <filter string="Patients"
+              name="patients"
+              domain="[('is_patient','=',True)]"
+              help="Filter By Patients Only" />
+        </xpath>
+        <xpath expr="//filter[@name='patients']" position="before">          
+          <filter string="Users"
+              name="users"
+              domain="[('is_patient','=',False)]"
+              help="Filter By System Users Only" />
+        </xpath>
+      </field>
+    </record>
+
+
+    <!-- res.partner action window -->
+    <record id="res_partner_users_action" model="ir.actions.act_window">
+      <field name="name">Users</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">res.partner</field>
+      <field name="view_mode">kanban,tree,form,activity</field>
+      <field name="search_view_id" ref="res_partner_inherited_filter"/>
+      <field name="context">{'search_default_users':1}</field>
+      <field name="help" type="html">
+        <p class="oe_view_nocontent_create">
+        </p><p>
+        </p>
+      </field>
+    </record>    
+
+
+    <record id="contacts.action_contacts" model="ir.actions.act_window">
+      <field name="name">Patients</field>
+      <field name="search_view_id" ref="res_partner_inherited_filter"/>
+      <field name="context">{'search_default_patients':1}</field>
+    </record>
+
+    <record id="contacts.menu_contacts" model="ir.ui.menu">
+      <field name="parent_id" ref="clinic_menu_root" />
+      <field name="sequence" eval="1" />
+      <field name="name">Patients</field>
+    </record>
+
+    
+
+    <record id="contacts.res_partner_menu_contacts" model="ir.ui.menu" >
+      <field name="name">Patients</field>
+      <field name="sequence">1</field>
+    </record>
+
+    <record id="contacts.res_partner_menu_config" model="ir.ui.menu" >
+      <field name="sequence">4</field>
+    </record>
+
+
+    <menuitem id="users_menu_act" name="Users" parent="contacts.menu_contacts" action="res_partner_users_action" sequence="2"/>
+
+
+
+  <!-- calendar.event changes -->
+
+  <!-- calendar.event inherit form view -->
+  <record id="calendar_event_inherited_form" model="ir.ui.view">
+    <field name="name">calendar.event.inherit.view.form</field>
+    <field name="model">calendar.event</field>
+    <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+    <field name="arch" type="xml">
+      <xpath expr="//sheet[1]" position="before">
+        <header>
+          <button name="create_invoice" string="Create Invoice" type="object" class="oe_highlight"
+          states="draft"/>
+          <button name="appointment_payment" string="Confirm" type="object" class="oe_highlight"
+          states="invoicing"/>
+          <button name="appointment_done" string="Done" type="object" class="oe_highlight"
+          states="progress"/>
+          <field name="state" widget="statusbar" statusbar_visible="draft,invoicing,progress,done"/>
+        </header>
+      </xpath>
+      <xpath expr="//button[@name='action_open_calendar_event']" position="attributes">        
+        <attribute name="invisible">True</attribute>
+      </xpath>
+      <xpath expr="//sheet[1]" position="after">
+        <header>
+          <!-- <button name="create_invoice" string="Create Invoice" type="object" class="oe_highlight"/> -->
+          <field name="state" widget="statusbar" statusbar_visible="draft,invoicing,progress,done"/>
+        </header>
+      </xpath>
+      <xpath expr="//div[1]" position="before">
+          <div class="oe_button_box" name="button_box">
+            <button class="oe_stat_button" name="appointment_invoices" type="object" icon="fa-pencil-square-o" attrs="{'invisible': [('invoices', '=', 0)]}">
+                <div class="o_stat_info">
+                  <field name="invoices" class="o_stat_value"/>
+                  <span class="o_stat_text">Invoices</span>
+                </div>
+            </button>
+          </div>
+      </xpath>
+      <xpath expr="//field[@name='name']" position="attributes">
+        <attribute name="placeholder">e.g First Checkup</attribute>
+        <attribute name="required">True</attribute>
+      </xpath>
+      <xpath expr="//field[@name='partner_ids']" position="attributes">
+        <attribute name="invisible">False</attribute>
+        <attribute name="placeholder">Select Doctor</attribute>
+      </xpath>
+      <xpath expr="//label[@for='partner_ids']" position="attributes">
+        <attribute name="invisible">False</attribute>
+        <attribute name="string">Doctor</attribute>
+      </xpath>
+      <xpath expr="//page[@name='page_details']" position="attributes">
+        <attribute name="string">Appointment Details</attribute>
+      </xpath>
+      <xpath expr="//page[@name='page_options']" position="attributes">
+        <attribute name="invisible">True</attribute>
+      </xpath>
+      <xpath expr="//page[@name='page_invitations']" position="attributes">
+        <attribute name="invisible">True</attribute>
+      </xpath>
+      <xpath expr="//page[@name='page_misc']" position="attributes">
+        <attribute name="invisible">True</attribute>
+      </xpath>
+      <xpath expr="//page[@name='page_details']" position="before">
+        <page string="Patient Details" name="patient_details">
+          <group>
+            <group>
+              <field name="patient_id"/>
+              <field name="patientID"/>
+              <field name="invoices" invisible="True"/>
+              
+            </group>
+            <group>
+              <field name="gender"/>
+              <field name="age"/>
+            </group>
+          </group>
+        </page>
+        <page string="Invoicing" name="invoicing">
+          <group>
+            <group>
+              <field name="user_id"/>
+            </group>
+            <group>
+              <field name="invoice_id" attrs="{'invisible':[('state','=','draft')]}"/>
+            </group>
+          </group>
+        </page>
+      </xpath>
+      <xpath expr="//notebook[1]" position="after">
+      <br/>
+      <br/>
+        <separator string="Doctor Notes" colspan="4" />
+          <field name="note" placeholder="Add notes here..."/>
+          <br/>
+        <separator string="Service" colspan="4"/>
+          <field name="product_id"/>
+        <br/>
+        <br/>
+
+      </xpath>
+
+
+    </field>
+  </record>
+
+  <!-- calendar.event inherit tree view -->
+  <record id="calendar_event_inherited_tree" model="ir.ui.view">
+    <field name="name">calendar.event.inherit.view.tree</field>
+    <field name="model">calendar.event</field>
+    <field name="inherit_id" ref="calendar.view_calendar_event_tree"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='partner_ids']" position="attributes">
+        <attribute name="invisible">True</attribute>
+      </xpath>
+      <xpath expr="//field[@name='duration']" position="after">
+        <field name="state"/>
+      </xpath>
+      <xpath expr="//field[@name='name']" position="after">
+        <field name="patient_id"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- calendar.event inherit calendar view -->
+  <record id="calender_event_inherited_view" model="ir.ui.view">
+    <field name="name">calendar.event.inherit.view.calendar</field>
+    <field name="model">calendar.event</field>
+    <field name="inherit_id" ref="calendar.view_calendar_event_calendar"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='attendee_status']" position="attributes">
+        <attribute name="invisible">True</attribute>
+      </xpath>
+      <xpath expr="//field[@name='partner_id']" position="attributes">
+        <attribute name="invisible">True</attribute>
+      </xpath>
+      <xpath expr="//field[@name='partner_ids']" position="attributes">
+        <attribute name="invisible">True</attribute>
+      </xpath>
+    </field>
+  </record>
+
+
+    <record id="calendar.mail_menu_calendar" model="ir.ui.menu" >
+      <field name="parent_id" ref="clinic_menu_root" />
+      <field name="name">Appointments</field>
+    </record>
+
+  <!-- calendar.event action window -->
+  <record id="calendar.action_calendar_event" model="ir.actions.act_window">
+    <field name="res_model">calendar.event</field>
+    <field name="name">Appointments</field>
+    <field name="view_mode">tree,calendar,form</field>
+  </record>
+
+  
+
+
+  <!-- Changing point of sale to pharmacy -->
+  
+  <record id="point_of_sale.menu_point_root" model="ir.ui.menu" >
+      <field name="name">Pharmacy</field>
+  </record>
+
+  <record id="point_of_sale.menu_pos_config_pos" model="ir.ui.menu" >
+      <field name="name">Pharmacy</field>
+  </record>
+
+  <record id="point_of_sale.action_pos_config_kanban" model="ir.actions.act_window">
+    <field name="name">Pharmacy</field>
+  </record>
+
+
+  
+
+  <!-- product.template Changes -->
+
+  <!-- product.template inherit form view -->
+  <record id="produtc_template_inherited_form" model="ir.ui.view">
+    <field name="name">product.template.inherit.view.form</field>
+    <field name="model">product.template</field>
+    <field name="inherit_id" ref="product.product_template_only_form_view"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='default_code']" position="attributes">
+        <attribute name="invisible">True</attribute>
+      </xpath>
+      <xpath expr="//field[@name='barcode']" position="attributes">
+        <attribute name="invisible">True</attribute>
+      </xpath>
+      <xpath expr="//page[1]" position="after">
+        <page string="Tests" attrs="{'invisible':[('type','!=','test')]}">
+          <group>
+            <group>
+              <field name="test_type"/>
+            </group>
+            <group>
+              <field name="normal"/>
+            </group>
+          </group>
+        </page>
+      </xpath>
+    </field>
+  </record>
+
+  </data>
+</odoo>

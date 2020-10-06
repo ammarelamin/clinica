@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <!-- Add you code here -->
+        
+        <!-- sit.sit form view -->
+        <record id="sits_room_view_form" model="ir.ui.view">
+            <field name="name">sits.room.view.form</field>
+            <field name="model">sit.sit</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,invoicing,progress,done"/>
+                        <button name="create_invoice" string="Create Invoice" type="object" class="oe_highlight"
+                        states="draft"/>
+                        <button name="sit_payment" string="Confirm Payment" type="object" class="oe_highlight"
+                        states="invoicing"/>
+                        <button name="state_done" string="Done" type="object" class="oe_highlight"
+                        states="progress"/>
+                    </header>
+                    <sheet>
+                    <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="open_invoice" type="object" icon="fa-pencil-square-o"
+                                attrs="{'invisible': [('invoice_count','=', 0)]}">
+                                <div class="o_stat_info">
+                                    <field name="invoice_count" class="o_stat_value"/>
+                                    <span class="o_stat_text">Invoices</span>
+                                </div>
+                            </button>
+                        </div>
+                        <br/>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <br/>
+                        <group>
+                            <group>
+                                <field name="patient_id" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+                                <field name="patientID"/>
+                            </group>
+                            <group>
+                                <field name="date" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+                                <field name="patient_age"/>
+                            </group>
+                        </group>
+                        <br/>
+                        <separator string="Sits Requests" colspan="4" />
+                        <br/>                        
+                        <notebook>
+                            <page string="Sits" name="sits">
+                                <field name="sit_ids" attrs="{'readonly':[('state','in',['done'])]}">
+                                    <tree string="" create="true" delete="true" edit="true" editable="bottom">
+                                        <field name="line_id" invisible="True"/>
+                                        <field name="product_id"/>
+                                        <field name="price"/>
+                                    </tree>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right" colspan="2">
+                                    <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                        <label for="price_total"/>
+                                    </div>
+                                    <field name="price_total" nolabel="1" class="oe_subtotal_footer_separator"/>
+                                    <div class="oe_clear"/>
+                                </group>
+                            </page>
+                            <page string="Notes" name="note">
+                                <group>
+                                    <field name="note" placeholder="Add your notes here..."
+                                    nolabel="1" attrs="{'readonly':[('state','in',['done'])]}"/>
+                                </group>
+                            </page>
+                            <page string="Invoice" name="invoicing">
+                                <group>
+                                    <group>
+                                        <field name="user_id"/>
+                                    </group>
+                                    <group>
+                                        <field name="invoice_id"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                        <br/>                    
+                        <br/>                    
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- sit.sit tree view -->
+        <record id="sits_room_view_tree" model="ir.ui.view">
+            <field name="name">sits.room.view.tree</field>
+            <field name="model">sit.sit</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="patient_id"/>
+                    <field name="patientID"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- sit.sit search view -->
+        <record id="sit_room_view_search" model="ir.ui.view">
+            <field name="name">sit.room.view.search</field>
+            <field name="model">sit.sit</field>
+            <field name="arch" type="xml">
+                <search string="">
+                    <field name="name"/>
+                    <field name="patient_id"/>
+                    <field name="patientID"/>
+                    <filter string="Patients"
+                        name="patients_group"
+                        context="{'group_by':'patient_id'}"
+                        help="Group Requests By Patients"/>
+                    
+                    <filter string="Requests"
+                        name="draft_requests"
+                        domain="[('state','=','draft')]"
+                        help="View Only Requests" />
+                    <filter string="In Progress"
+                        name="in_progress"
+                        domain="[('state','=','progress')]"
+                        help="On Progress Requests" />
+                    <filter string="Done"
+                        name="done"
+                        domain="[('state','=','done')]"
+                        help="Finished Tests" />
+                    <!-- <filter string="Refused"
+                        name="refuse"
+                        domain="[('state','=','refuse')]"
+                        help="Refused Tests" /> -->
+                </search>
+            </field>
+        </record>
+
+        <!-- sit.sit action window -->
+        <record id="sits_room_requests_action" model="ir.actions.act_window">
+            <field name="name">Sits</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sit.sit</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="sit_room_view_search"/>
+            <field name="context">{"search_default_draft_requests":1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create new sit request
+                </p><p>
+                </p>
+            </field>
+        </record>
+
+        <!-- sit.sit action window -->
+        <record id="sits_room_progress_action" model="ir.actions.act_window">
+            <field name="name">Sits</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sit.sit</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="sit_room_view_search"/>
+            <field name="context">{"search_default_in_progress":1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create new sit request
+                </p><p>
+                </p>
+            </field>
+        </record>
+
+        <!-- sit.sit action window -->
+        <record id="sits_room_done_action" model="ir.actions.act_window">
+            <field name="name">Sits</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sit.sit</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="sit_room_view_search"/>
+            <field name="context">{"search_default_done":1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create new sit request
+                </p><p>
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="sits_room_menu_categ" name="Sits Room" parent="clinic_menu_root" sequence="12"/>
+        <menuitem id="sits_menu_categ" name="Sits" parent="sits_room_menu_categ" sequence="1"/>
+        <menuitem id="sits_requests_menu_act" name="Requests" parent="sits_menu_categ" action="sits_room_requests_action" sequence="3"/>
+        <menuitem id="sits_progress_menu_act" name="In Progress" parent="sits_menu_categ" action="sits_room_progress_action" sequence="5"/>
+        <menuitem id="sits_done_menu_act" name="Done" parent="sits_menu_categ" action="sits_room_done_action" sequence="7"/>
+    
+    
+    </data>
+</odoo>

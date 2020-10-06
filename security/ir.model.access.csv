@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_clinic_lab,access_clinic_lab,model_clinic_lab,base.group_user,1,1,1,1
+access_test_line,access_test_line,model_test_line,base.group_user,1,1,1,1
+access_sit_sit,access_sit_sit,model_sit_sit,base.group_user,1,1,1,1
+access_sit_line,access_sit_line,model_sit_line,base.group_user,1,1,1,1
+access_disease_disease,access_disease_disease,model_disease_disease,base.group_user,1,1,1,1

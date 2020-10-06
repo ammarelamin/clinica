@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        
+        <menuitem id="configurations_menu_categ" name="Configuration" parent="clinic_menu_root" sequence="20"/>
+        
+
+        <!-- product.template inherit search view -->
+        <record id="product_template_inherited_search" model="ir.ui.view">
+            <field name="name">product.template.inherit.view.search</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='services']" position="before">
+                    <filter string="Laboratory Tests" name="laboratory_tests" domain="[('type','=','test')]"/>
+                </xpath>
+            </field>
+        </record>
+
+
+        <record id="laboratory_tests_action" model="ir.actions.act_window">
+            <field name="name">Tests</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">kanban,tree,form,activity</field>
+            <field name="search_view_id" ref="product_template_inherited_search"/>
+            <field name="context">{'default_type':'test', 'search_default_laboratory_tests':1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new test
+                </p><p>
+                    
+                </p>
+            </field>
+        </record>
+
+        <menuitem id="laboratory_tests_menu_act" name="Tests" parent="configurations_menu_categ" action="laboratory_tests_action" sequence="4"/>
+
+
+        <!-- disease.disease tree view -->
+        <record id="clinic_diseases_view_tree" model="ir.ui.view">
+            <field name="name">clinic.diseases.view.tree</field>
+            <field name="model">disease.disease</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- disease.disease action window -->
+        <record id="clinic_diseases_action" model="ir.actions.act_window">
+            <field name="name">Diseases</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">disease.disease</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="clinic_diseases_menu_act" name="Diseases" parent="configurations_menu_categ" action="clinic_diseases_action" sequence="8"/>
+
+
+    </data>
+</odoo>

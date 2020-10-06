@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Patient IDs sequence -->
+        <record id="patient_identification_number" model="ir.sequence">
+            <field name="name">Patients</field>
+            <field name="code">res.partner</field>
+            <field name="active">TRUE</field>
+            <field name="prefix">P</field>
+            <field name="padding">5</field>
+        </record>
+
+
+        <!-- Laboratory Requests sequence -->
+        <record id="laboratory_requests_identification_number" model="ir.sequence">
+            <field name="name">Laboratory Requests</field>
+            <field name="code">clinic.lab</field>
+            <field name="active">TRUE</field>
+            <field name="prefix">Request#</field>
+            <field name="padding">5</field>
+        </record>
+
+
+        <!-- Sits Room Requests sequence -->
+        <record id="sit_request_identification_number" model="ir.sequence">
+            <field name="name">Sits</field>
+            <field name="code">sit.sit</field>
+            <field name="active">TRUE</field>
+            <field name="prefix">SIT/</field>
+            <field name="padding">5</field>
+        </record>
+
+
+    </data>
+</odoo>

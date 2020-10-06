@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+
+        <!-- clinic.lab form view -->
+        <record id="clinic_laboratory_view_form" model="ir.ui.view">
+            <field name="name">clinic.laboratory.view.form</field>
+            <field name="model">clinic.lab</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <header>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,invoicing,progress,done"/>
+                        <button name="create_invoice" string="Create Invoice" type="object" class="oe_highlight"
+                        states="draft"/>
+                        <button name="labrotary_payment" string="Confirm Payment" type="object" class="oe_highlight"
+                        states="invoicing"/>
+                        <button name="state_done" string="Laboratory Tests Done" type="object" class="oe_highlight"
+                        states="progress"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" name="open_invoice" type="object" icon="fa-pencil-square-o"
+                                attrs="{'invisible': [('invoice_count','=', 0)]}">
+                                <div class="o_stat_info">
+                                    <field name="invoice_count" class="o_stat_value"/>
+                                    <span class="o_stat_text">Invoices</span>
+                                </div>
+                            </button>
+                        </div>
+                        <br/>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                        <br/>
+                        <group>
+                            <group>
+                                <field name="patient_id" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+                                <field name="patientID"/>
+                            </group>
+                            <group>
+                                <field name="date" attrs="{'readonly':[('state','not in',['draft'])]}"/>
+                                <field name="patient_age"/>
+                                <field name="invoice_count" invisible="True"/>
+                            </group>
+                        </group>
+                        <br/>
+                        <separator string="Tests Requests &amp; Results" colspan="4" />
+                        <br/>                        
+                        <notebook>
+                            <page string="Tests Requests &amp; Results" name="tests_results">
+                                <field name="test_ids" attrs="{'readonly':[('state','in',['done'])]}">
+                                    <tree string="" create="true" delete="true" edit="true" editable="bottom">
+                                        <field name="line_id" invisible="True"/>
+                                        <field name="product_id"/>
+                                        <field name="test_type"/>
+                                        <field name="normal"/>
+                                        <field name="price"/>
+                                        <field name="result"/>
+                                        <field name="situation"/>
+                                    </tree>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right" colspan="2">
+                                    <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                        <label for="price_total"/>
+                                    </div>
+                                    <field name="price_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                    <div class="oe_clear"/>
+                                </group>
+                            </page>
+                            <page string="Notes" name="note">
+                                <group>
+                                    <field name="note" placeholder="Add your notes here..."
+                                    nolabel="1" attrs="{'readonly':[('state','in',['done'])]}"/>
+                                </group>
+                            </page>
+                            <page string="Invoice" name="invoicing">
+                                <group>
+                                    <group>
+                                        <field name="user_id"/>
+                                    </group>
+                                    <group>
+                                        <field name="invoice_id"/>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                        <br/>           
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- clinic.lab tree view -->
+        <record id="clinic_laboratory_view_tree" model="ir.ui.view">
+            <field name="name">clinic.laboratory.view.tree</field>
+            <field name="model">clinic.lab</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="patient_id"/>
+                    <field name="patientID"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- clinic.lab search view -->
+        <record id="clinic_laboratory_view_search" model="ir.ui.view">
+            <field name="name">clinic.laboratory.view.search</field>
+            <field name="model">clinic.lab</field>
+            <field name="arch" type="xml">
+                <search string="">
+                    <field name="name"/>
+                    <field name="patient_id"/>
+                    <field name="patientID"/>
+                    <filter string="Patients"
+                        name="patients_group"
+                        context="{'group_by':'patient_id'}"
+                        help="Group Requests By Patients"/>
+                    
+                    <filter string="Requests"
+                        name="draft_requests"
+                        domain="[('state','=','draft')]"
+                        help="View Only Requests" />
+                    <filter string="In Progress"
+                        name="in_progress"
+                        domain="[('state','=','progress')]"
+                        help="On Progress Requests" />
+                    <filter string="Done"
+                        name="done"
+                        domain="[('state','=','done')]"
+                        help="Finished Tests" />
+                    <!-- <filter string="Refused"
+                        name="refuse"
+                        domain="[('state','=','refuse')]"
+                        help="Refused Tests" /> -->
+                </search>
+            </field>
+        </record>
+
+        <!-- clinic.lab action window -->
+        <record id="clinic_laboratory_all_action" model="ir.actions.act_window">
+            <field name="name">Laboratory Tests</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">clinic.lab</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                </p><p>
+                </p>
+            </field>
+        </record>
+
+
+        <!-- clinic.lab action window -->
+        <record id="clinic_laboratory_action_requests" model="ir.actions.act_window">
+            <field name="name">Laboratory Requests</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">clinic.lab</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="clinic_laboratory_view_search"/>
+            <field name="context">{'search_default_draft_requests':1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create new test request
+                </p><p>
+                    <!-- More details about what a user can do with this object will be OK --> 
+                </p>
+            </field>
+        </record>
+
+        <!-- clinic.lab action window -->
+        <record id="clinic_laboratory_action_in_progress" model="ir.actions.act_window">
+            <field name="name">Laboratory Requests</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">clinic.lab</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="clinic_laboratory_view_search"/>
+            <field name="context">{'search_default_in_progress':1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No in progress Requests
+                </p><p>
+                </p>
+            </field>
+        </record>
+
+        <!-- clinic.lab action window -->
+        <record id="clinic_laboratory_action_done" model="ir.actions.act_window">
+            <field name="name">Laboratory Requests</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">clinic.lab</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="clinic_laboratory_view_search"/>
+            <field name="context">{'search_default_done':1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No done Requests
+                </p><p>
+                </p>
+            </field>
+        </record>
+
+
+        <menuitem id="laboratory_menu_categ" name="Laboratory" parent="clinic_menu_root" sequence="8"/>
+        <menuitem id="laboratory_tests_menu_categ" name="Laboratory Tests" parent="laboratory_menu_categ" sequence="4"/>
+        <menuitem id="clinic_laboratory_requests_menu_act" name="Requests" parent="laboratory_tests_menu_categ" action="clinic_laboratory_action_requests" sequence="3"/>
+        <menuitem id="clinic_laboratory_in_progress_menu_act" name="In Progress" parent="laboratory_tests_menu_categ" action="clinic_laboratory_action_in_progress" sequence="5"/>
+        <menuitem id="clinic_laboratory_done_menu_act" name="Done" parent="laboratory_tests_menu_categ" action="clinic_laboratory_action_done" sequence="7"/>
+        <menuitem id="all_menu_act" name="All" parent="laboratory_tests_menu_categ" action="clinic_laboratory_all_action" sequence="10"/>
+
+    </data>
+</odoo>
