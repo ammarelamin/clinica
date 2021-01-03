@@ -19,7 +19,7 @@
     'version': '1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'contacts', 'calendar', 'account', 'om_account_accountant', 'stock', 'point_of_sale'],
+    'depends': ['base', 'contacts', 'calendar', 'account', 'om_account_accountant', 'stock', 'point_of_sale','l10n_generic_coa'],
 
     # always loaded
     'data': [
@@ -30,6 +30,7 @@
         'views/setting.xml',
         'views/sits_room.xml',
         'views/templates.xml',
+        'report/laboratory_report.xml',
         'sequence.xml',
     ],
     # only loaded in demonstration mode

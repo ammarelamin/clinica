@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <data>
+        <!-- Add you code here -->
+        
+        <report 
+            id="report_laboratory"
+            string="Laboratory Results"
+            model="clinic.lab"
+            report_type="qweb-pdf"
+            name="clinica.lab_report"
+            file="clinica.lab_report"
+        />
+
+        <template id="lab_report">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="web.external_layout">
+                        <div class="page">
+                            <h4 align="center">Laboratory Results</h4>
+                        </div>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <div align="left">
+                            <p >
+                                <strong style="color:green">Patient:</strong> <span t-field="doc.patient_id.name"/>
+                            </p>
+                            <p>
+                                <strong style="color:green">PatientID:</strong> <span t-field="doc.patient_id.patientID"/>
+                            </p>
+                        </div>
+                        <div align="right">
+                            <p>
+                                <strong style="color:green">Date:</strong> <span t-field="doc.date"/>
+                            </p>
+                        </div>
+
+                        <br/>
+                        <br/>
+
+                        <table class="table table-condensed">
+							<thead>
+								<tr>
+                                    <th style="color:green" class="text-center"> Test </th>
+                                    <th  style="color:green" class="text-center"> Test Type </th>
+                                    <th  style="color:green" class="text-center"> Normal </th>
+                                    <th  style="color:green" class="text-center"> Result </th>
+                                    <th  style="color:green" class="text-center"> Situation </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="doc.test_ids" t-as="test">
+                                    <tr>
+                                        <td  class="text-center" style="white-space: text-nowrap;">
+                                            <span t-esc="test.product_id.name" />
+                                        </td>
+                                        <td  class="text-center" style="white-space: text-nowrap;">
+                                            <span t-esc="test.product_id.test_type" />
+                                        </td>
+                                        <td  class="text-center" style="white-space: text-nowrap;">
+                                            <span t-esc="test.product_id.normal" />
+                                        </td>
+                                        <td  class="text-center" style="white-space: text-nowrap;">
+                                            <span t-esc="test.result" />
+                                        </td>
+                                        <td  class="text-center" style="white-space: text-nowrap;">
+                                            <span t-esc="test.situation" />
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <br/>
+                        <t t-if="doc.note">
+                            <p>
+                                <strong style="color:green">Notes:</strong>
+                            </p>
+                            <span t-field="doc.note"/>
+                        </t>
+                    </t>
+                </t>
+            </t>
+
+
+        </template>
+
+    </data>
+</odoo>

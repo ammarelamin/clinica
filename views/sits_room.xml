@@ -50,7 +50,7 @@
                         <br/>                        
                         <notebook>
                             <page string="Sits" name="sits">
-                                <field name="sit_ids" attrs="{'readonly':[('state','in',['done'])]}">
+                                <field name="sit_ids" attrs="{'readonly':[('state','not in',['draft'])]}">
                                     <tree string="" create="true" delete="true" edit="true" editable="bottom">
                                         <field name="line_id" invisible="True"/>
                                         <field name="product_id"/>
@@ -130,10 +130,6 @@
                         name="done"
                         domain="[('state','=','done')]"
                         help="Finished Tests" />
-                    <!-- <filter string="Refused"
-                        name="refuse"
-                        domain="[('state','=','refuse')]"
-                        help="Refused Tests" /> -->
                 </search>
             </field>
         </record>
@@ -186,12 +182,26 @@
             </field>
         </record>
 
+        <record id="sits_room_all_action" model="ir.actions.act_window">
+            <field name="name">Sits</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sit.sit</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create new sit request
+                </p><p>
+                </p>
+            </field>
+        </record>
+
 
         <menuitem id="sits_room_menu_categ" name="Sits Room" parent="clinic_menu_root" sequence="12"/>
         <menuitem id="sits_menu_categ" name="Sits" parent="sits_room_menu_categ" sequence="1"/>
         <menuitem id="sits_requests_menu_act" name="Requests" parent="sits_menu_categ" action="sits_room_requests_action" sequence="3"/>
         <menuitem id="sits_progress_menu_act" name="In Progress" parent="sits_menu_categ" action="sits_room_progress_action" sequence="5"/>
         <menuitem id="sits_done_menu_act" name="Done" parent="sits_menu_categ" action="sits_room_done_action" sequence="7"/>
+        <menuitem id="sits_all_menu_act" name="All" parent="sits_menu_categ" action="sits_room_all_action" sequence="9"/>
     
     
     </data>

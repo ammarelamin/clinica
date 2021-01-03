@@ -1,10 +1,6 @@
 from odoo import api, fields, models, _
 from datetime import date, datetime
-from dateutil.relativedelta import relativedelta
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT as DATE_FORMAT
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
 from odoo.exceptions import UserError, ValidationError
-
 
 
 
@@ -13,71 +9,75 @@ class resPartner(models.Model):
 
     patientID = fields.Char(string='Patient ID', readonly=True, copy=False, default='New')
     address_name = fields.Char(string='Address')
-    is_patient = fields.Boolean(string='Is Patient?', default=True)
-    date_of_birth = fields.Date(string='Date Of Birth', required=False)
-    age = fields.Integer(string='Age', required=False)
+    is_patient = fields.Boolean(string='Is Patient', default=True)
+    date_of_birth = fields.Date(string='Date Of Birth')
+    age = fields.Integer(string='Age')
     gender = fields.Selection(string='Gender', selection=[('male', 'Male'), ('female', 'Female'),],
     default='female')
     company_type = fields.Selection(default='person')
-    gender = fields.Selection(string='Gender', selection=[('male', 'Male'), ('female', 'Female'),],
-    default='female')
-    appointments = fields.Integer(string='Appointments',readonly=True, compute='patient_history')
-    tests_count = fields.Integer(string='Laboratory',readonly=True, compute='laboratory_history')
+    appointments = fields.Integer(string='Appointments', default=0, compute='_get_patient_history')
+    tests_count = fields.Integer(string='Laboratory', default=0, compute='_get_laboratory_history')
+    sits_count = fields.Integer(string='Sits', default=0, compute='_get_sits_history')
     disease_ids = fields.Many2many(comodel_name='disease.disease', string='Diseases')
     
-    
+
     @api.model
     def create(self, vals):
         if vals.get('patientID', 'New') == 'New':
             vals['patientID'] = self.env['ir.sequence'].next_by_code('res.partner') or ''
             result = super(resPartner, self).create(vals)
         return result
-
     
-    @api.constrains('age')
-    def check_age(self):
-        for record in self:
-            if record.age == 0:
-                raise ValidationError("Please enter valid age!")
+    # @api.constrains('age')
+    # def check_age(self):
+    #     for record in self:
+    #         if record.age == 0:
+    #             raise ValidationError("Please enter valid age!")
     
-    
-    def patient_history(self):
-        self.ensure_one()
-        history_list = []
+    def _get_patient_history(self):
         for rec in self:
-            history_count = self.env['calendar.event'].search_count([('patient_id','=',rec.id)])
             history_ids = self.env['calendar.event'].search([('patient_id','=',rec.id)])
-            history_list = history_ids.mapped('id')
-            rec.write({'appointments': history_count})
-
-        return {
-        'name': 'Appointments',
-        'type': 'ir.actions.act_window',
-        'view_mode': 'tree,form',
-        'res_model': 'calendar.event',
-        'view_id': False,
-        'target': 'current',
-        'domain': [('id','in', history_list)],
-        'context': {'default_patient_id': self.id},
-        }
-
+            rec.write({'appointments': len(history_ids)})
     
+    def open_patient_history(self):
+        return {
+            'name': 'Appointments',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'tree,form',
+            'res_model': 'calendar.event',
+            'target': 'current',
+            'domain': [('patient_id','=', self.id)],
+            'context': {'default_patient_id': self.id},
+        }
         
-    def laboratory_history(self):
-        self.ensure_one()
-        lab_list = []
+    def _get_laboratory_history(self):
         for rec in self:
-            history_count = self.env['clinic.lab'].search_count([('patient_id','=',rec.id)])
             lab_ids = self.env['clinic.lab'].search([('patient_id','=',rec.id)])
-            lab_list = lab_ids.mapped('id')
-            rec.write({'tests_count': history_count})
-
+            rec.write({'tests_count': len(lab_ids)})
+    
+    def open_laboratory_history(self):
         return {
         'name': 'Laboratory Tests',
         'type': 'ir.actions.act_window',
         'view_mode': 'tree,form',
         'res_model': 'clinic.lab',
-        'domain': [('id','in', lab_list)],
+        'domain': [('patient_id','=', self.id)],
+        'context': {'default_patient_id': self.id},
+        }
+
+
+    def _get_sits_history(self):
+        for rec in self:
+            sit_ids = self.env['sit.sit'].search([('patient_id','=',rec.id)])
+            rec.write({'sits_count': len(sit_ids)})
+    
+    def open_sits_history(self):
+        return {
+        'name': 'Sits',
+        'type': 'ir.actions.act_window',
+        'view_mode': 'tree,form',
+        'res_model': 'sit.sit',
+        'domain': [('patient_id','=', self.id)],
         'context': {'default_patient_id': self.id},
         }
 
@@ -162,3 +162,15 @@ class productTemplate(models.Model):
     test_type = fields.Selection(string='Type', selection=[('clinical_chemistry', 'Clinical Chemistry'), ('rapid_test', 'Rapid Tests'),
                                                             ('serum_lithium','Serum Lithium'),('hormons_tumor_markees','Homrmons & Tumor Markees'),
                                                             ('haematology','Haematology'), ('other','Other')])
+
+
+
+class Users(models.Model):
+    _inherit = 'res.users'
+
+    @api.model
+    def create(self, vals):
+        vals['is_patient'] = False
+        vals['gender'] = False
+        result = super(Users, self).create(vals)
+        return result

@@ -23,12 +23,15 @@
       <field name="inherit_id" ref="base.view_partner_form"/>
       <field name="arch" type="xml">
         <xpath expr="//div[@name='button_box']" position="inside">
-          <button class="oe_stat_button" name="patient_history" type="object"
+          <button class="oe_stat_button" name="open_patient_history" type="object"
           icon="fa-file-o" attrs="{'invisible':[('is_patient','=',False)]}">
-              <field string="History" name="appointments" widget="statinfo" />
+              <field string="Appointments" name="appointments" widget="statinfo" />
           </button>
-          <button class="oe_stat_button" name="laboratory_history" type="object" icon="fa-stethoscope" attrs="{'invisible':[('is_patient','=',False)]}">
+          <button class="oe_stat_button" name="open_laboratory_history" type="object" icon="fa-stethoscope" attrs="{'invisible':[('is_patient','=',False)]}">
               <field string="Laboratory" name="tests_count" widget="statinfo" />
+          </button>
+          <button class="oe_stat_button" name="open_sits_history" type="object" icon="fa-list" attrs="{'invisible':[('is_patient','=',False)]}">
+              <field string="Sits" name="sits_count" widget="statinfo" />
           </button>
         </xpath>
         <xpath expr="//field[@name='name']" position="attributes">
@@ -51,6 +54,9 @@
         <xpath expr="//field[@name='phone']" position="replace">
         </xpath>
         <xpath expr="//field[@name='email']" position="replace">
+        </xpath>
+        <xpath expr="//label[@for='phone']" position="attributes">
+          <attribute name="invisible">True</attribute>
         </xpath>
         <xpath expr="//page[1]" position="attributes">
           <attribute name="invisible">True</attribute>
@@ -92,7 +98,7 @@
           attrs="{'invisible':[('is_patient','=',False)]}"/>
         </xpath>
         <xpath expr="//field[@name='date_of_birth']" position="after">
-          <field name="age" widget="char"
+          <field name="age"
           attrs="{'invisible':[('is_patient','=',False)]}"/>
         </xpath>
         <xpath expr="//label[@name='address_name']" position="attributes">
@@ -325,16 +331,11 @@
         </page>
       </xpath>
       <xpath expr="//notebook[1]" position="after">
-      <br/>
-      <br/>
-        <separator string="Doctor Notes" colspan="4" />
-          <field name="note" placeholder="Add notes here..."/>
-          <br/>
         <separator string="Service" colspan="4"/>
           <field name="product_id"/>
-        <br/>
-        <br/>
-
+        <separator string="Doctor Notes" colspan="4" attrs="{'invisible':[('state','in',['draft','invoicing'])]}"/>
+          <field name="note" placeholder="Add notes here..."
+          attrs="{'invisible':[('state','in',['draft','invoicing'])]}"/>  
       </xpath>
 
 

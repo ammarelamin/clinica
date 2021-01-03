@@ -1,8 +1,4 @@
-
 from datetime import date, datetime
-from dateutil.relativedelta import relativedelta
-from odoo.tools import DEFAULT_SERVER_DATE_FORMAT as DATE_FORMAT
-from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT as DATETIME_FORMAT
 from odoo.exceptions import UserError, ValidationError
 from odoo import api, fields, models, _
 
@@ -22,7 +18,7 @@ class Sits(models.Model):
     readonly=True)
     patient_age = fields.Integer(string='Age', related='patient_id.age',
     readonly=True)
-    price_total = fields.Float(string='Total', compute='compute_total_price')
+    price_total = fields.Float(string='Total', compute='compute_total_price', store=True)
     note = fields.Text(string='Note')
     user_id = fields.Many2one(comodel_name='res.users', string='Responsible', readonly=True,
     default=lambda self: self.env.user)
@@ -47,7 +43,7 @@ class Sits(models.Model):
         for rec in self:
             price_sum = 0
             for record in rec.sit_ids:
-                price_sum += record.product_id.list_price
+                price_sum += record.price
             rec.price_total = price_sum
 
 
@@ -101,6 +97,15 @@ class Sits(models.Model):
     def state_done(self):
         self.write({'state':'done'})
 
+    
+    def unlink(self):
+        for record in self:
+            if record.state not in ('draft'):
+                raise UserError(
+                    'You cannot delete a sit request which is not draft!'
+                )
+        return super(Sits, self).unlink()
+
 
 
 class sitLine(models.Model):
@@ -108,9 +113,11 @@ class sitLine(models.Model):
     _description = 'Sit Line'
 
     line_id = fields.Many2one(comodel_name='sit.sit', string='')
+    state = fields.Selection(string='State', related='line_id.state', selection=[('draft', 'Request'), ('invoicing', 'Invoicing'), ('progress', 'In Progress'),('done', 'Done'),('reject', 'Rejected'),],
+    readonly=True)
     product_id = fields.Many2one(comodel_name='product.template', string='Sit', 
     domain=[('type','=','service')], required=True)
-    price = fields.Float(string='Price', related='product_id.list_price', readonly=True)
+    price = fields.Float(string='Price', related='product_id.list_price', readonly=False)
 
 
 
